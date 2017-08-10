@@ -4,81 +4,78 @@ using UnityEngine;
 
 public class TwoTinesForkController : MonoBehaviour
 {
-
-    public TineController LeftTine;
-    public TineController RightTine;
-
     public TineController.TOUCH_POINTS NumberOfPointToCheck;
     
     private bool leftTineCompleted;
     private bool rightTineCompleted;
 
+    private InstanceCounterDictionary<GameObject> touchesByGameObject;
+
     private void Awake()
     {
-
-        LeftTine.NumberOfPointToCheck = NumberOfPointToCheck;
-        RightTine.NumberOfPointToCheck = NumberOfPointToCheck;
-
-        LeftTine.OnTineTouchesCompleted += HandleOnTineTouchesCompleted;
-        LeftTine.OnTineTouchesIncompleted += HandleOnTineTouchesIncompleted;
-
-        RightTine.OnTineTouchesCompleted += HandleOnTineTouchesCompleted;
-        RightTine.OnTineTouchesIncompleted += HandleOnTineTouchesIncompleted;
+        touchesByGameObject = new InstanceCounterDictionary<GameObject>();
     }
 
     private void OnDestroy()
     {
-        LeftTine.OnTineTouchesCompleted -= HandleOnTineTouchesCompleted;
-        LeftTine.OnTineTouchesIncompleted -= HandleOnTineTouchesIncompleted;
-
-        RightTine.OnTineTouchesCompleted -= HandleOnTineTouchesCompleted;
-        RightTine.OnTineTouchesIncompleted -= HandleOnTineTouchesIncompleted;
+        touchesByGameObject.Clear();
     }
 
-
-
-    private void HandleOnTineTouchesIncompleted(TineController tineController, GameObject collisionGameObject)
+    private void OnTriggerEnter(Collider other)
     {
-        if (tineController == LeftTine)
-            leftTineCompleted = false;
+        GameObject pallet = other.transform.parent.gameObject;
 
-        if (tineController == RightTine)
-            rightTineCompleted = false;
+        if (pallet.name.Contains("Pallet"))
+        {
+            HandleOnTineTouchesCompleted(pallet);
+        }
+    }
 
-        if (!leftTineCompleted && !rightTineCompleted)
+    //private void OnTriggerExit(Collider other)
+    //{
+    //    GameObject pallet = other.transform.parent.gameObject;
+
+    //    if (pallet.name.Contains("Pallet"))
+    //    {
+    //        HandleOnTineTouchesIncompleted(pallet);
+    //    }
+    //}
+
+    private void HandleOnTineTouchesCompleted(GameObject collisionGameObject)
+    {
+
+        PalletController pc = collisionGameObject.GetComponent<PalletController>();
+        if (pc == null) return;
+
+        int touches = touchesByGameObject.Add(collisionGameObject);
+        
+        if (touches == (int)NumberOfPointToCheck)
+        {
+            Rigidbody r = collisionGameObject.GetComponent<Rigidbody>();
+            if (r != null && pc.IsOnGround)
+            {
+                r.isKinematic = true;
+            }
+            
+            pc.OnGround += HandleOnGround;
+        }
+    }
+
+    private void HandleOnTineTouchesIncompleted(GameObject collisionGameObject)
+    {
+
+        PalletController pc = collisionGameObject.GetComponent<PalletController>();
+        if (pc == null) return;
+
+        int touches = touchesByGameObject.Remove(collisionGameObject);
+
+        if (touches < (int) NumberOfPointToCheck)
         {
             Rigidbody r = collisionGameObject.GetComponent<Rigidbody>();
             if (r != null)
             {
                 r.isKinematic = false;
-                r.useGravity = false;
             }
-        }
-    }
-
-    private void HandleOnTineTouchesCompleted(TineController tineController, GameObject collisionGameObject)
-    {
-        if (tineController == LeftTine)
-            leftTineCompleted = true;
-
-        if (tineController == RightTine)
-            rightTineCompleted = true;
-
-        PalletController pc = collisionGameObject.GetComponent<PalletController>();
-        if (pc == null) return;
-
-        pc.OnGround += HandleOnGround;
-
-        if (leftTineCompleted && rightTineCompleted && !pc.IsOnGround)
-        {
-            Rigidbody r = collisionGameObject.GetComponent<Rigidbody>();
-            if (r != null)
-            {
-                r.isKinematic = true;
-                r.useGravity = true;
-            }
-
-            
         }
     }
 
