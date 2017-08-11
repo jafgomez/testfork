@@ -5,85 +5,96 @@ using UnityEngine;
 public class TwoTinesForkController : MonoBehaviour
 {
     public TineController.TOUCH_POINTS NumberOfPointToCheck;
-    
+
+    private Rigidbody myRigidbody;
+
     private bool leftTineCompleted;
     private bool rightTineCompleted;
 
-    private InstanceCounterDictionary<GameObject> touchesByGameObject;
+    private List<GameObject> controlledPallets;
+
+    private PalletController currentPalletController;
 
     private void Awake()
     {
-        touchesByGameObject = new InstanceCounterDictionary<GameObject>();
+        myRigidbody = GetComponent<Rigidbody>();
+        controlledPallets = new List<GameObject>();
+
     }
 
     private void OnDestroy()
     {
-        touchesByGameObject.Clear();
+        controlledPallets.Clear();
+        controlledPallets = null;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        GameObject pallet = other.transform.parent.gameObject;
-
-        if (pallet.name.Contains("Pallet"))
+        PalletController pc = other.GetComponentInParent<PalletController>();
+        if (pc != null)
         {
-            HandleOnTineTouchesCompleted(pallet);
+            if (!controlledPallets.Contains(pc.gameObject))
+            {
+                controlledPallets.Add(pc.gameObject);
+                pc.OnCarryMe += HandleOnCarryMe;
+                pc.OnDropIt += HandleOnDropIt;
+            }
+            pc.SetTouchZone(other.GetComponent<TouchZoneDescriptor>().TouchZone, true);
         }
-    }
-
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    GameObject pallet = other.transform.parent.gameObject;
-
-    //    if (pallet.name.Contains("Pallet"))
-    //    {
-    //        HandleOnTineTouchesIncompleted(pallet);
-    //    }
-    //}
-
-    private void HandleOnTineTouchesCompleted(GameObject collisionGameObject)
-    {
-
-        PalletController pc = collisionGameObject.GetComponent<PalletController>();
-        if (pc == null) return;
-
-        int touches = touchesByGameObject.Add(collisionGameObject);
         
-        if (touches == (int)NumberOfPointToCheck)
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        PalletController pc = other.GetComponentInParent<PalletController>();
+        if (pc != null)
         {
-            Rigidbody r = collisionGameObject.GetComponent<Rigidbody>();
-            if (r != null && pc.IsOnGround)
+            if (controlledPallets.Contains(pc.gameObject))
             {
-                r.isKinematic = true;
+                controlledPallets.Remove(pc.gameObject);
+                pc.OnCarryMe -= HandleOnCarryMe;
+                pc.OnDropIt -= HandleOnDropIt;
             }
-            
-            pc.OnGround += HandleOnGround;
+            pc.SetTouchZone(other.GetComponent<TouchZoneDescriptor>().TouchZone, false);
+        }
+
+        //HandleTriggerAction(other.GetComponent<PalletController>(), false);
+    }
+
+    private void HandleOnDropIt(PalletController pc)
+    {
+        //HandleTriggerAction(pc, false);
+    }
+
+    private void HandleOnCarryMe(PalletController pc)
+    {
+        HandleTriggerAction(pc, true);
+    }
+
+
+    private void HandleTriggerAction(PalletController pc, bool isEnter)
+    {
+        if (pc != null)
+        {
+            HandleOnTineTouchesCompleted(pc);
         }
     }
 
-    private void HandleOnTineTouchesIncompleted(GameObject collisionGameObject)
+    private void HandleOnTineTouchesCompleted(PalletController pc)
     {
-
-        PalletController pc = collisionGameObject.GetComponent<PalletController>();
-        if (pc == null) return;
-
-        int touches = touchesByGameObject.Remove(collisionGameObject);
-
-        if (touches < (int) NumberOfPointToCheck)
+        if (pc.AllTouched)
         {
-            Rigidbody r = collisionGameObject.GetComponent<Rigidbody>();
-            if (r != null)
+            if (pc.IsOnGround)
             {
-                r.isKinematic = false;
+                currentPalletController = pc;
+                currentPalletController.SetForkRigidbody(myRigidbody);
             }
         }
-    }
-
-    private void HandleOnGround(PalletController obj)
-    {
-        Rigidbody r = obj.GetComponent<Rigidbody>();
-        if (r != null)
-            r.isKinematic = false;
+        else
+        {
+            currentPalletController.SetForkRigidbody(null);
+            currentPalletController = null;
+        }
     }
 }
 

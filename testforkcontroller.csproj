@@ -78,7 +78,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ForkController.cs" />
+    <Compile Include="Assets\Test1\TestForkController.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\DictionaryExtensions.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\KinematicBoxController.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\PalletController.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\TineController.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\TouchZoneDescriptor.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\TwoTinesForkController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
