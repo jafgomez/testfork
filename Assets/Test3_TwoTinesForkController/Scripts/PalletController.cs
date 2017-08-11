@@ -130,7 +130,18 @@ public class PalletController : MonoBehaviour
             myRigidbody.MovePosition(localOffset);
             myRigidbody.MoveRotation(ForkRigidbody.rotation);
 
+            if (DetectGroundCollision())
+            {
+                EnableTouchZone(true);
+            }
+
         }
+    }
+
+    private bool DetectGroundCollision()
+    {
+        return Physics.CheckBox(transform.position, transform.localScale, transform.rotation, 0,
+            QueryTriggerInteraction.Ignore);
     }
 
     private void EnableTouchZone(bool enable)
