@@ -140,7 +140,8 @@ public class PalletController : MonoBehaviour
 
     private bool DetectGroundCollision()
     {
-        return Physics.CheckBox(transform.position, transform.localScale, transform.rotation, 0,
+        LayerMask m = 1 << LayerMask.NameToLayer("Ground");
+        return Physics.CheckBox(transform.position, transform.localScale, transform.rotation, m,
             QueryTriggerInteraction.Ignore);
     }
 
