@@ -83,7 +83,16 @@
     <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\KinematicBoxController.cs" />
     <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\PalletController.cs" />
     <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\TineController.cs" />
+    <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\TouchZoneDescriptor.cs" />
     <Compile Include="Assets\Test3_TwoTinesForkController\Scripts\TwoTinesForkController.cs" />
+    <Compile Include="Assets\Test4_Rigidbody\Scripts\ForkController.cs" />
+    <Compile Include="Assets\Test4_Rigidbody\Scripts\ForkLiftFake.cs" />
+    <Compile Include="Assets\Test4_Rigidbody\Scripts\ForkLiftInput.cs" />
+    <Compile Include="Assets\Test4_Rigidbody\Scripts\test.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\extern\LIFUserVehicles\Common\borrar.txt" />
+    <None Include="Assets\extern\LIFUserVehicles\Toyota_8FG\Piece Prefabs\borrar.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
