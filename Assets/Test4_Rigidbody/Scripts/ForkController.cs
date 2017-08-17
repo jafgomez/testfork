@@ -14,10 +14,17 @@ public class ForkController : MonoBehaviour
     public float MaxYmast; //The maximum height of the mast
     public float MinYmast; //The minimum height of the mast
     private Rigidbody _logicForkRigidbody;
-    
+    [SerializeField]
+    private float _initialForkHeight;
+    [SerializeField]
+    private float _deltaForkHeight;
+
     private void Awake()
     {
         _logicForkRigidbody = LogicFork.GetComponent<Rigidbody>();
+
+        _initialForkHeight = ForkDescriptor.Fork.localPosition.y;
+        
     }
     
 
@@ -31,13 +38,21 @@ public class ForkController : MonoBehaviour
         float factorV = SpeedTranslateFactor*rawVerticalInput*Time.deltaTime;
         float factorH = SpeedTranslateFactor*rawHorizontalInput*Time.deltaTime;
 
-        Vector3 translation = new Vector3(0f, factorV, factorH);
-        
+        if (ForkDescriptor.Fork.localPosition.y + factorV > MaxTranslation.y || ForkDescriptor.Fork.localPosition.y + factorV <= MinTranslation.y + _initialForkHeight)
+            factorV = 0f;
+
+        if (ForkDescriptor.Fork.localPosition.x + factorH > MaxTranslation.x || ForkDescriptor.Fork.localPosition.x + factorH <= MinTranslation.x)
+            factorH = 0f;
+
+
+
+        Vector3 translation = new Vector3(factorH, factorV, 0f);
         Vector3 logicPosition = translation + _logicForkRigidbody.position;
 
         _logicForkRigidbody.MovePosition(logicPosition);
         ForkDescriptor.Fork.Translate(translation);
-        
+
+
         //if (mastMoveTrue)
         //{
         //    mast.Translate(Vector3.up * speedTranslate * Time.deltaTime);
