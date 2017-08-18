@@ -5,8 +5,7 @@ using UnityEngine;
 public class ForkLiftInput : MonoBehaviour
 {
 
-    public float forkVerticalInput;
-    public float forkHorizontalInput;
+    public ForkController ForkController;
 
 	// Use this for initialization
 	void Start ()
@@ -22,8 +21,9 @@ public class ForkLiftInput : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-	    forkVerticalInput = Input.GetAxisRaw("Vertical");
-        forkHorizontalInput = Input.GetAxisRaw("Horizontal");
-         
-	}
+	    ForkController.ForkYAxisInput = Input.GetAxisRaw("Vertical");
+        ForkController.ForkXAxisInput = Input.GetAxisRaw("Horizontal");
+        ForkController.ForkZAxisInput = Input.GetAxisRaw("Frontal");
+
+    }
 }

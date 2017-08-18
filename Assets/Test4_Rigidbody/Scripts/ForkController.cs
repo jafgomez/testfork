@@ -5,25 +5,28 @@ using UnityEngine;
 
 public class ForkController : MonoBehaviour
 {
-    public ForkLiftInput LiftInput;
     public ForkDescriptor ForkDescriptor;
     public Transform LogicFork;
     public float SpeedTranslateFactor; //Platform travel speed
     public Vector3 MaxTranslation; //The maximum translation limit of the platform
     public Vector3 MinTranslation; //The minimum translation limit of the platform
-    public float MaxYmast; //The maximum height of the mast
-    public float MinYmast; //The minimum height of the mast
+
+    public float ForkYAxisInput;
+    public float ForkXAxisInput;
+    public float ForkZAxisInput;
+    public float MastInput;
+    
     private Rigidbody _logicForkRigidbody;
-    [SerializeField]
     private float _initialForkHeight;
-    [SerializeField]
-    private float _deltaForkHeight;
+    private float _initialForkFront;
+
 
     private void Awake()
     {
         _logicForkRigidbody = LogicFork.GetComponent<Rigidbody>();
 
         _initialForkHeight = ForkDescriptor.Fork.localPosition.y;
+        _initialForkFront = ForkDescriptor.Fork.localPosition.z;
         
     }
     
@@ -31,22 +34,28 @@ public class ForkController : MonoBehaviour
     private void FixedUpdate()
     {
 
-        float rawVerticalInput = LiftInput.forkVerticalInput;
-        float rawHorizontalInput = LiftInput.forkHorizontalInput;
+        float rawYInput = ForkYAxisInput;
+        float rawXInput = ForkXAxisInput;
+        float rawZInput = ForkZAxisInput;
+        
 
         
-        float factorV = SpeedTranslateFactor*rawVerticalInput*Time.deltaTime;
-        float factorH = SpeedTranslateFactor*rawHorizontalInput*Time.deltaTime;
+        float factorY = SpeedTranslateFactor*rawYInput*Time.deltaTime;
+        float factorX = SpeedTranslateFactor*rawXInput*Time.deltaTime;
+        float factorZ = SpeedTranslateFactor*rawZInput*Time.deltaTime;
 
-        if (ForkDescriptor.Fork.localPosition.y + factorV > MaxTranslation.y || ForkDescriptor.Fork.localPosition.y + factorV <= MinTranslation.y + _initialForkHeight)
-            factorV = 0f;
+        if (ForkDescriptor.Fork.localPosition.y + factorY > MaxTranslation.y || ForkDescriptor.Fork.localPosition.y + factorY <= MinTranslation.y + _initialForkHeight)
+            factorY = 0f;
 
-        if (ForkDescriptor.Fork.localPosition.x + factorH > MaxTranslation.x || ForkDescriptor.Fork.localPosition.x + factorH <= MinTranslation.x)
-            factorH = 0f;
+        if (ForkDescriptor.Fork.localPosition.x + factorX > MaxTranslation.x || ForkDescriptor.Fork.localPosition.x + factorX <= MinTranslation.x)
+            factorX = 0f;
+
+        if (ForkDescriptor.Fork.localPosition.z + factorZ > MaxTranslation.z + _initialForkFront || ForkDescriptor.Fork.localPosition.z + factorZ <= MinTranslation.z + _initialForkFront)
+            factorZ = 0f;
 
 
 
-        Vector3 translation = new Vector3(factorH, factorV, 0f);
+        Vector3 translation = new Vector3(factorX, factorY, factorZ);
         Vector3 logicPosition = translation + _logicForkRigidbody.position;
 
         _logicForkRigidbody.MovePosition(logicPosition);
