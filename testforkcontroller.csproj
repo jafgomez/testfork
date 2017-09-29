@@ -92,6 +92,7 @@
     <Compile Include="Assets\Test4_Rigidbody\Scripts\test.cs" />
     <Compile Include="Assets\Test5_Forces\ForceUp.cs" />
     <Compile Include="Assets\Test5_Forces\ForkLiftInput2.cs" />
+    <Compile Include="Assets\Test6_collisions\PalletCollisionController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Test4_Rigidbody\LIFUserVehicles\Common\borrar.txt" />
